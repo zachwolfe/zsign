@@ -396,6 +396,47 @@ bool IsPathSuffix(const string &strPath, const char *suffix)
 	return false;
 }
 
+static EntryType PosixGetEntryType(const char *path) {
+	struct stat statbuf;
+	stat(path, &statbuf);
+	if (S_ISDIR(statbuf.st_mode))
+	{
+		return ET_DIR;
+	}
+	else if (S_ISREG(statbuf.st_mode))
+	{
+		return ET_REG;
+	}
+	else
+	{
+		return ET_OTHER;
+	}
+}
+
+EntryType GetEntryType(const char *path, const dirent *entry) {
+#ifdef _WIN32
+	return PosixGetEntryType(path);
+#else
+	if (DT_DIR == entry->d_type)
+	{
+		return ET_DIR;
+	}
+	else if (DT_REG == entry->d_type) {
+		return ET_REG;
+	}
+	else if (DT_UNKNOWN == entry->d_type)
+	{
+		// Entry type can be unknown depending on the underlying file system
+		ZLog::DebugV(">>> Unknown directory entry type for %s, falling back to POSIX-compatible check\n", path);
+		return PosixGetEntryType(path);
+	}
+	else
+	{
+		return ET_OTHER;
+	}
+#endif
+}
+
 time_t GetUnixStamp()
 {
 	time_t ustime = 0;

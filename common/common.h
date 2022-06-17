@@ -37,6 +37,12 @@ uint16_t _Swap(uint16_t value);
 uint32_t _Swap(uint32_t value);
 uint64_t _Swap(uint64_t value);
 
+enum EntryType {
+    ET_DIR,
+    ET_REG,
+    ET_OTHER,
+};
+
 bool ReadFile(const char *szFile, string &strData);
 bool ReadFile(string &strData, const char *szFormatPath, ...);
 bool WriteFile(const char *szFile, const string &strData);
@@ -65,6 +71,7 @@ bool IsZipFile(const char *szFile);
 string GetCanonicalizePath(const char *szPath);
 void *MapFile(const char *path, size_t offset, size_t size, size_t *psize, bool ro);
 bool IsPathSuffix(const string &strPath, const char *suffix);
+EntryType GetEntryType(const char *path, const dirent *entry);
 
 const char *StringFormat(string &strFormat, const char *szFormatArgs, ...);
 string &StringReplace(string &context, const string &from, const string &to);
